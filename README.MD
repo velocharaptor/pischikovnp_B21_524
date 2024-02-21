@@ -21,7 +21,7 @@ git remote add upstream git@github.com:nilgorithm/semOavi.git
 git fetch upstream
 ```
 
-В папке results данного семинара будет представлен пример c вышеописанной структурой. На всякий случай еще тут оставлю [link](https://github.com/nilgorithm/semOavi/tree/master/2sem/results).
+В папке results/EXAMPLE второго семинара будет представлен пример c вышеописанной структурой. На всякий случай еще тут оставлю [link](https://github.com/nilgorithm/semOavi/tree/master/2sem/results/EXAMPLE). Пример предполагает, что на студента была распределен "Алгоритм глобальной бинаризации с критерием Отсу". Пользоваться средствами opencv как в примере **нельзя**. 
 
 ## Название форка под каждого студента
 
