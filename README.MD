@@ -7,7 +7,7 @@
 ```bash
 git remote add upstream git@github.com:nilgorithm/semOavi.git
 ```
-Название веток должны быть нативно понятными, поэтому сделаем их как "**biletovmd_B21_504**" от исходного "**_Билетов Михаил Дмитриевич Б21-504_**". Я думаю я нагенерю вам их для своего же удобства. 
+Название веток должны быть нативно понятными, поэтому сделаем их как "**ivanovii_B21_504**" от исходного "**_Иванов Иван Иванович Б21-504_**". Внизу они нагенерены, если у вас появилось ощущение, что вы не можете найти себя - пингуйте.
 
 Ваша задача будет в папку results по каждому семинару подгружать результаты выполнения лабораторных работ. Структура будет следующей: 
 1) Вы делаете сабдиректории c названиями индексов заданий, к примеру для этой лабы: ![Лаба 2](src/lab2.jpg) <br> Будет всего две папки с названиями **"1"** и **"2"** соответственно. В папке **"1"** лежит проект по **_"Приведению  полноцветного  изображения  к  полутоновому"_**, а в папке **"2.5"** соотвествтенно тот проект, который я на вас распределил, к примеру это будет **_"5 Алгоритм адаптивной бинаризации Эйквил."_**. <br> ***ВАЖНО**! Если у задания есть свой саб индекс - названием папки оформляется по принципу номер задание/разделитель/индекс, то есть в случае с Эйквил название папки **"2"** будет **"2.5"**. 
@@ -22,3 +22,48 @@ git fetch upstream
 ```
 
 В папке results данного семинара будет представлен пример c вышеописанной структурой. На всякий случай еще тут оставлю [link](https://github.com/nilgorithm/semOavi/tree/master/2sem/results).
+
+## Название форка под каждого студента
+
+biletovmd_B21_504
+kondrashkinas_B21_504
+kulikovdi_B21_504
+mironovatv_B21_504
+pavlovdg_B21_504
+pokroyaa_B21_504
+popovza_B21_504
+stegniyiv_B21_504
+ulyanovev_B21_504
+khalilulinrm_B21_504
+shnyakinde_B21_504
+belyakovkg_B21_514
+varlamovai_B21_514
+lutsenkosа_B21_514
+sirodjevas_B21_514
+antonovna_B21_524
+apalkovama_B21_524
+belovapo_B21_524
+vasilevfn_B21_524
+gorlovms_B21_524
+gubarevso_B21_524
+kovorotnysd_B21_524
+legkoduhka_B21_524
+matveevpd_B21_524
+merkulovdv_B21_524
+parkhomenkodo_B21_524
+petrosyanss_B21_524
+pischikovnp_B21_524
+sedinkinma_B21_524
+starodubtsevaa_B21_524
+sukhininаа_B21_524
+tsibikovma_B21_524
+chvanovaes_B21_524
+shishkinna_B21_524
+al-alushia_B21_564
+batsaihans_B21_564
+bloshenkinaaa_B21_564
+nguyentm_B21_564
+tivariss_B21_564
+shobichr_B21_564
+
+*Совет - использовать vscode (потому что кроссплатформенность), на который стоит поставить плагин: [Markdown+Math](https://marketplace.visualstudio.com/items?itemName=goessner.mdmath). Т.к. в jupyter сделаны вставки md с katex и LaTeX разметкой.
