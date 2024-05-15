@@ -17,11 +17,10 @@ def semitone(input_path, output_path):
 def main():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     output_path = os.path.join(current_dir, 'output')
-    names = ['4sem/result/4.2/input/eye.png']
+    names = ['4sem/results/4.2/input/eye.png']
     for input_path in names:
         curr_opath = os.path.join(output_path, os.path.splitext("semitone_" + os.path.basename(input_path))[0])
         semitone(input_path, curr_opath)
 
 if __name__ == "__main__":
     main()
-
