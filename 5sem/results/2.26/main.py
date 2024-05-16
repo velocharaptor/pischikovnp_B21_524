@@ -59,51 +59,37 @@ def create_report(letters):
         writer.writeheader()
 
         for letter in letters:
-            try:
-                img_src = Image.open(f"5sem/results/1.26/font/{letter}.png").convert('L')
-                img_src_arr = np.array(img_src, dtype=np.uint8)
+            img = Image.open(f"5sem/results/1.26/font/{letter}.png").convert('L')
+            img_arr = np.array(img, dtype=np.uint8)
 
-                features = create_features(img_src_arr)
-                features['Letter'] = letter
+            features = create_features(img_arr)
+            features['Letter'] = letter
 
-                writer.writerow(features)
-            except ZeroDivisionError:
-                # Handle the ZeroDivisionError here, for example:
-                print("ZeroDivisionError occurred for letter:", chr(int(letter, 16)))
-                # You can also choose to log the error or take other appropriate actions
-                pass
+            writer.writerow(features)
 
-def color_used_arr(img):  
-    return np.asarray(np.asarray(img) < 1, dtype = np.int0)
-
-def get_profiles(img):
-    img_arr_for_calculations = color_used_arr(img)
-    
-    x_profiles = np.sum(img_arr_for_calculations, axis=0)
-    x_range = np.arange(1, img_arr_for_calculations.shape[1] + 1)
-    
-    y_profiles = np.sum(img_arr_for_calculations, axis=1)
-    y_range = np.arange(1, img_arr_for_calculations.shape[0] + 1)  
-    
+def get_profiles(img_arr):
     return {
-        'x_profiles': x_profiles,
-        'x_range': x_range,
-        'y_profiles': y_profiles,
-        'y_range': y_range
+        "x": {
+            "profiles": np.sum(img_arr, axis=0),
+            "range": np.arange(1, img_arr.shape[1] + 1)
+        },
+        "y": {
+            "profiles": np.sum(img_arr, axis=1),
+            "range": np.arange(1, img_arr.shape[0] + 1)
+        }
     }
 
 def add_profile(img, letter, type="x"):
     profiles = get_profiles(img)
     
     if type == 'x':
-        plt.bar(x=profiles['x_range'], height=profiles['x_profiles'], width=0.85)
-        plt.ylim(0, max(profiles['x_profiles']))
-        plt.xlim(0, max(profiles['x_range']))
-
+        plt.bar(x=profiles["x"]["range"], height=profiles["x"]["profiles"], width=0.85)
+        plt.ylim(0, max(profiles["x"]["profiles"]))
+        plt.xlim(0, max(profiles["x"]["range"]))
     else:
-        plt.barh(y=profiles['y_range'], width=profiles['y_profiles'], height=0.85)
-        plt.ylim(max(profiles['y_range']), 0 )
-        plt.xlim(0, max(profiles['y_profiles']))
+        plt.barh(y=profiles["y"]["range"], width=profiles["y"]["profiles"], height=0.85)
+        plt.ylim(max(profiles["y"]["range"]), 0 )
+        plt.xlim(0, max(profiles["y"]["profiles"]))
 
     plt.savefig(f"5sem/results/2.26/output/profiles/{type}/{letter}.png")
     plt.clf()
@@ -120,10 +106,9 @@ def create_profiles(letters):
         add_profile(img_arr, letter, "x")
 
 def main():
-    letters = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
+    letters = "abcdefghijklmnopqrstuvwxyz"
     create_report(letters)
-    #create_profiles(letters)
-
+    create_profiles(letters)
 
 if __name__ == "__main__":
     main()

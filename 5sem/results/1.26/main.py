@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 
 def main():
-    letters = "абвгдеёжзийклсмнопрстуфхцчшщъыьэюя"
+    letters = "abcdefghijklmnopqrstuvwxyz"
     font = ImageFont.truetype("5sem/results/1.26/font/Arial-Italic.ttf", 69)
 
     for letter in letters:
