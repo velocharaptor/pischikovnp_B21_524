@@ -74,8 +74,8 @@ def crop_segments():
         i+=1
 
 def main():
+    #сегменты вырезаются, не обводятся, нужно добавить удаление белых пиксилей
     test_img = Image.open("6sem/results/6.1/output/sentence.png")
-    
     crop_segments()
     create_profiles(test_img)
 

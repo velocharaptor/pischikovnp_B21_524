@@ -118,6 +118,7 @@ def create_profiles(letters):
         add_profile(img_arr, letter, "x")
 
 def main():
+    #английский курсив стиль ариэль
     letters = "abcdefghijklmnopqrstuvwxyz"
     create_report(letters)
     create_profiles(letters)

@@ -12,7 +12,7 @@ def make_spectrogram(samples, sample_rate, save=False):
     plt.pcolormesh(times, frequencies, np.log10(my_spectrogram), shading='auto')
     plt.ylabel('Частота [Гц]')
     plt.xlabel('Время [с]')
-    if(save): {
+    if (save): {
         plt.savefig('9sem/results/output/spectrogram/spectrogram_original.png', dpi=500)
     }
 
@@ -42,6 +42,7 @@ def make_energy_plt(sample_rate, samples, cutoff_freuency=4000):
     plt.savefig('9sem/results/output/high_energy_moments.png')
 
 def main():
+    #звук пианино
     sample_rate, samples = wavfile.read("9sem/results/input/guitar.wav")
     make_spectrogram(samples, sample_rate, True)
     make_butter_filter(sample_rate, samples)

@@ -72,6 +72,7 @@ def get_corr(haralic_matrix):
 
     return (p_i_j - u_i * u_j) / (sigma_I * sigma_J)
 
+#выравнивание гистограммы
 def equalize_histogram(image):
     histogram = np.zeros(256)
 

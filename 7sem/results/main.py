@@ -178,6 +178,7 @@ def generate_text(text, size):
     binarization(image, 100).save(f"7sem/results/input/sentence_{size}.png")
 
 def main():
+    #Плохо классифицирует символы, додедлать
     generate_text("snow cat and bear", 100)
     create_regocnition("5sem/results/2.26/output/data.csv")
         

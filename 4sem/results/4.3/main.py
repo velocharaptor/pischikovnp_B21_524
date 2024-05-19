@@ -49,6 +49,7 @@ def main():
         input_img = Image.open(input_path)
         image = np.array(input_img)
 
+        #Приютт оператор
         pruitt_x_image, pruitt_y_image, pruitt_image = Prewitt_opertor(image)
         binarized_100_image = binarization(pruitt_image, 100)
 
