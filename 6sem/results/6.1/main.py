@@ -1,5 +1,4 @@
 from PIL import Image, ImageDraw, ImageFont
-from pathlib import Path
 import numpy as np
 
 def binarization(image, threshold):

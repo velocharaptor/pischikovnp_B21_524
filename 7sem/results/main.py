@@ -1,10 +1,8 @@
 import numpy as np
-from PIL import Image, ImageFont, ImageDraw, ImageOps
+from PIL import Image, ImageFont, ImageDraw
 from matplotlib import pyplot as plt
 import csv
-import pandas as pd
 from math import sqrt
-from operator import itemgetter
 
 def binarization(image, threshold):
     old_image = np.array(image)
@@ -97,7 +95,7 @@ def calculate_distance(features_global, features_local):
 
     new_result = {}
     for letter, distance in result.items():
-        new_result[letter] = round(1 - distance, 2) / _max 
+        new_result[letter] = (_max - distance) / _max 
 
     return new_result
 
@@ -134,7 +132,7 @@ def crop_segments(img):
         box = (segment[0] + 1, 0, segment[1] - 1, img.height)
         res = img.crop(box)
         #res.save(f"7sem/results/output/letters/{i + 1}.png")
-        #i+=1
+        # i+=1
         letters_list.append(res)
     return letters_list
 

@@ -9,7 +9,7 @@ def binarization(old_image, threshold):
     new_image[old_image > threshold] = 255
     return new_image.astype(np.uint8)
 
-def Prewitt_algolitmn(image) :
+def Prewitt_opertor(image) :
     height, width = image.shape[:2]
   
     G_x = np.array([[-1, -1, -1, -1, -1],
@@ -32,10 +32,8 @@ def Prewitt_algolitmn(image) :
             G_x_res[y, x] = np.sum(G_x * window)
             G_y_res[y, x] = np.sum(G_y * window)
 
-    #находим градиент
     G_res = np.sqrt(np.square(G_x_res) + np.square(G_y_res))#возведение в квадрат поэлементное, а не матричное
   
-    #нормализация градиента
     G_res = ((G_res - np.min(G_res)) / (np.max(G_res) - np.min(G_res))) * 255
 
     return (G_x_res.astype(np.uint8),
@@ -51,7 +49,7 @@ def main():
         input_img = Image.open(input_path)
         image = np.array(input_img)
 
-        pruitt_x_image, pruitt_y_image, pruitt_image = Prewitt_algolitmn(image)
+        pruitt_x_image, pruitt_y_image, pruitt_image = Prewitt_opertor(image)
         binarized_100_image = binarization(pruitt_image, 100)
 
         new_img = Image.fromarray(pruitt_image)
