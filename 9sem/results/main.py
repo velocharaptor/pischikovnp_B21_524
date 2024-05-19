@@ -16,14 +16,6 @@ def make_spectrogram(samples, sample_rate, save=False):
         plt.savefig('9sem/results/output/spectrogram/spectrogram_original.png', dpi=500)
     }
 
-# Низких частот
-def noise_reduction(samples, sample_rate, cutoff_freuency):
-    z = signal.savgol_filter(samples, 101, 3)
-    b, a = signal.butter(3, cutoff_freuency / sample_rate)
-    zi = signal.lfilter_zi(b, a)
-    z, _ = signal.lfilter(b, a, z, zi = zi * z[0])
-    return z
-
 def make_butter_filter(sample_rate, data):
     b, a = signal.butter(10, 0.1, btype='lowpass')
     filtered_signal = signal.filtfilt(b, a, data)
