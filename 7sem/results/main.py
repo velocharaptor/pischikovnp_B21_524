@@ -1,186 +1,159 @@
-import numpy as np
-from PIL import Image, ImageFont, ImageDraw
-from matplotlib import pyplot as plt
+from PIL import Image
 import csv
-from math import sqrt
+import math
+import numpy as np
 
-def binarization(image, threshold):
-    old_image = np.array(image)
-    new_image = np.zeros(shape=old_image.shape)
-    new_image[old_image > threshold] = 255
-    return Image.fromarray(new_image.astype(np.uint8), 'L')
+start_unicode = ord('a')
+end_unicode = ord('z')
 
-def get_weight(img_px, width, height):
-    size = width * height
-    weight = 0
-    for i in range(width):   
-        for j in range(height):
-            if img_px[i, j] == 0: 
-                weight += 1
-    rel_weight = weight / size 
+ENG_LETTER = [chr(code_point) for code_point in range(start_unicode, end_unicode + 1)]
 
-    return weight, rel_weight
+# def calc_black_weight(bd_image):
+#     return np.sum(bd_image)
 
-def get_avg(img_px, weight, width, height):
-    x_avg, y_avg = 0, 0
-    for i in range(width):   
-        for j in range(height):
-            if img_px[i, j] == 0: 
-                x_avg += i   
-                y_avg += j
-    x_avg /= weight
-    y_avg /= weight
-    rel_x_avg = (x_avg - 1) / (width - 1)  
-    rel_y_avg = (y_avg - 1) / (height - 1) 
+# def calc_rel_black_weight(bd_image):
+#     return calc_black_weight(bd_image) / bd_image.size
 
-    return (x_avg, y_avg), (rel_x_avg, rel_y_avg)
+# def calc_center_of_gravity(bd_image):
+#     height, width = bd_image.shape
 
-def get_inertia(img_px, x_avg, y_avg, width, height):
-    inertia_x, inertia_y = 0, 0
-    for i in range(width): 
-        for j in range(height):
-            if img_px[i, j] == 0: 
-                inertia_x = (j - x_avg) ** 2
-                inertia_y = (i - y_avg) ** 2
-    rel_inertia_x = inertia_x / (width ** 2 * height ** 2)  
-    rel_inertia_y = inertia_y / (width ** 2 * height ** 2)
-    
-    return (inertia_x, inertia_y), (rel_inertia_x, rel_inertia_y)
+#     black_weight = calc_black_weight(bd_image)
 
-def create_features(image_array):
-    img_px = np.zeros(shape=image_array.shape)
-    img_px[image_array != 255] = 1
+#     center_x = (np.sum(bd_image, axis=1) @ np.array(range(height))) / black_weight
+#     center_y = (np.sum(bd_image, axis=0) @ np.array(range(width))) / black_weight
 
-    width, height = image_array.shape[:2]
-    size = width * height
+#     return center_x, center_y
 
-    weight, rel_weight = get_weight(img_px, width, height)
-    xy_avg, rel_xy_avg = get_avg(img_px, weight, width, height)
-    inertia, rel_inertia = get_inertia(img_px, xy_avg[0], xy_avg[1], width, height)
-    return {
-            "Normalized Weight" : rel_weight,
-            "Normalized Mass Center" : rel_xy_avg,
-            "Normalized Inertia Moments" : rel_inertia,
-        }
+# def calc_rel_center_of_gravity(bd_image):
+#     height, width = bd_image.shape
 
-def load_features(path):
-    with open(path, 'r', newline='', encoding='utf-8') as csvfile:
+#     center_x, center_y = calc_center_of_gravity(bd_image)
+
+#     return (center_x - 1) / (height - 1), (center_y - 1) / (width - 1)
+
+# def calc_horizontal_inertia_moment(bd_image):
+#     _, width = bd_image.shape
+#     _, y_center = calc_center_of_gravity(bd_image)
+
+#     return np.sum((np.array(range(width)) - y_center)**2 @ np.transpose(bd_image))
+
+# def calc_vertical_inertia_moment(bd_image):
+#     height, _ = bd_image.shape
+#     x_center, _ = calc_center_of_gravity(bd_image)
+#     return np.sum((np.array(range(height)) - x_center)**2 @ bd_image)
+
+# def calc_rel_horizontal_inertia_moment(bd_image):
+#     height, width = bd_image.shape
+
+#     return calc_horizontal_inertia_moment(bd_image) / (height**2 * width**2)
+
+# def calc_rel_vertical_inertia_moment(bd_image):
+#     height, width = bd_image.shape
+
+#     return calc_vertical_inertia_moment(bd_image) / (height**2 * width**2)
+
+
+# def create_features(img: np.array):
+#     x, y = calc_rel_center_of_gravity(img)
+#     return calc_black_weight(img), x, y, calc_rel_horizontal_inertia_moment(img), calc_rel_vertical_inertia_moment(img)
+
+def create_features(img: np.array):
+    img_b = np.zeros(img.shape, dtype=int)
+    img_b[img != 255] = 1  
+
+    weight = np.sum(img_b)
+
+    y_indices, x_indices = np.indices(img_b.shape)
+    y_center_of_mass = np.sum(y_indices * img_b) / weight
+    x_center_of_mass = np.sum(x_indices * img_b) / weight
+
+    inertia_x = np.sum((y_indices - y_center_of_mass) ** 2 * img_b) / weight
+    inertia_y = np.sum((x_indices - x_center_of_mass) ** 2 * img_b) / weight
+
+    return weight, x_center_of_mass, y_center_of_mass, inertia_x, inertia_y
+
+def get_segments(img):
+    profile = np.sum(img == 0, axis=0)
+
+    in_letter = False
+    letter_segment = []
+
+    for i in range(len(profile)):
+        if profile[i] > 0:
+            if not in_letter:
+                in_letter = True
+                start = i
+        else:
+            if in_letter:
+                in_letter = False
+                end = i
+                letter_segment.append((start - 1, end))
+
+    if in_letter:
+        letter_segment.append((start, len(profile)))
+
+    return letter_segment
+
+def load_features_1():
+    with open('5sem/results/2.26/output/csv/data_unicode.csv', 'r') as csvfile:
         reader = csv.DictReader(csvfile)
 
-        result = {}
-        for row in reader:
-            result[row['Letter']] = {
-                'Normalized Weight': float(row['Normalized Weight']),
-                'Normalized Mass Center': tuple(map(float, row['Normalized Mass Center'][1:len(row['Normalized Mass Center'])-1].split(', '))),
-                'Normalized Inertia Moments': tuple(map(float, row['Normalized Inertia Moments'][1:len(row['Normalized Inertia Moments'])-1].split(', ')))
-            }
+        result = dict()
+
+        for i, row in enumerate(reader):
+            weight = int(row['weight'])
+            center_of_mass = tuple(map(float, row['center_of_mass'].strip('()').split(',')))
+            inertia = tuple(map(float, row['inertia'].strip('()').split(',')))
+            result[ENG_LETTER[i]] = weight, *center_of_mass, *inertia
 
         return result
 
-def feature_distance(features_1, features_2):
-    return sqrt(
-        (features_1['Normalized Weight'] - features_2['Normalized Weight'])**2 +
-        (features_1['Normalized Mass Center'][0] - features_2['Normalized Mass Center'][0])**2 +
-        (features_1['Normalized Mass Center'][1] - features_2['Normalized Mass Center'][1])**2 +
-        (features_1['Normalized Inertia Moments'][0] - features_2['Normalized Inertia Moments'][0])**2 +
-        (features_1['Normalized Inertia Moments'][1] - features_2['Normalized Inertia Moments'][1])**2
-    )
+def create_regocnition(load_features: dict[chr, tuple], target_features):
+    def feature_distance(feature1, feature2):
+        return math.sqrt(sum((a - b) ** 2 for a, b in zip(feature1, feature2)))
 
-def calculate_distance(features_global, features_local):
-    result = {}
-    for letter, features in features_global.items():
-        result[letter] = feature_distance(features_local, features)
+    distances = dict()
+    for letter, features in load_features.items():
+        distance = feature_distance(target_features, features)
+        distances[letter] = distance
 
-    _max = max(result.values())
+    max_distance = max(distances.values())
 
-    new_result = {}
-    for letter, distance in result.items():
-        new_result[letter] = (_max - distance) / _max 
+    similarities = [(letter, round(1 - distance / max_distance, 2)) for letter, distance in distances.items()]
 
-    return new_result
+    return sorted(similarities, key=lambda x: x[1])
 
-def fix_color(img):  
-    return np.asarray(np.asarray(img) < 1, dtype = np.int8)
 
-def get_segments(img):
-    img_arr_for_calculations = fix_color(img)
-    x_profiles = np.sum(img_arr_for_calculations, axis=0) 
-    lst = [] 
-    new_lst = []  
-    for i in range(len(x_profiles)):   
-        if x_profiles[i] == 0:
-            lst.append(i)
-    lst.append(img.width)  
+def get_regocnition(text, img: np.array, segments):
+    load_features = load_features_1()
+    res = []
+    for start, end in segments:
+        letter_features = create_features(img[:, start: end])
+        hypothesis = create_regocnition(load_features, letter_features)
+        best_hypotheses = hypothesis[-1][0]
+        res.append(best_hypotheses)
 
-    for i in range(len(lst)-1):
-        if lst[i] + 1 != lst[i+1]:
-            new_lst.append(lst[i])
-            new_lst.append(lst[i+1])
-    new_lst.append(img.width-1)
-    new_lst = sorted(list(set(new_lst))) 
+    res = "".join(res)
 
-    segments = []
-    for i in range(0, len(new_lst)-1, 2):
-        segments.append((new_lst[i], new_lst[i+1]))
-    return segments
+    max_len = max(len(text), len(res))
+    orig = text.ljust(max_len)
+    detected = res.ljust(max_len)
+    with open("7sem/results/output/result_power.txt", 'w') as f:
+        correct_letters = 0
+        by_letter = ["has | got | correct"]
+        for i in range(max_len):
+            is_correct = orig[i] == detected[i]
+            by_letter.append(f"{orig[i]}\t{detected[i]}\t{is_correct}")
+            correct_letters += int(is_correct)
+        f.write("\n".join([
+            f"phrase:      {orig}",
+            f"detected:    {detected}",
+            f"correct:     {math.ceil(correct_letters / max_len * 100)}%\n\n"
+        ]))
+        f.write("\n".join(by_letter))
 
-def crop_segments(img):
-    letters_list = []
+if __name__ == "__main__":
+    text = "show me your power".replace(" ", "")
+    img = np.array(Image.open(f'6sem/results/6.1/output/text_power.bmp').convert('L'))
     segments = get_segments(img)
-    i = 0
-    for segment in segments:
-        box = (segment[0] + 1, 0, segment[1] - 1, img.height)
-        res = img.crop(box)
-        #res.save(f"7sem/results/output/letters/{i + 1}.png")
-        # i+=1
-        letters_list.append(res)
-    return letters_list
-
-def create_report(letters):
-    with open("7sem/results/output/data.csv", 'w', newline='', encoding='utf-8') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames = 
-        ["Letter", "Weight", 
-         "Normalized Weight", "Mass Center",
-         "Normalized Mass Center", "Inertia Moments", 
-         "Normalized Inertia Moments"]
-         )
-        writer.writeheader()
-        symbol = ["s","n","o","w","c","a","t","a","n","d","b","e","a","r"]
-        for i, letter in enumerate(letters):
-            letter_arr = np.array(letter, dtype=np.uint8)
-
-            features = create_features(letter_arr)
-            features['Letter'] = symbol[i]
-
-            writer.writerow(features)
-
-def create_regocnition(path):
-    img = Image.open("7sem/results/input/sentence_100.png").convert('L')
-    letters_list = crop_segments(img)
-    save_features = load_features(path)
-    #create_report(letters_list)
-
-    with open("7sem/results/output/output.txt", "a", encoding="utf-8") as file:
-        for i, letter in enumerate(letters_list):
-            letter_arr = np.array(letter, dtype=np.uint8)
-            current_features = create_features(letter_arr)
-            grades = calculate_distance(save_features, current_features)
-            file.write(f"{i + 1}: {dict(sorted(grades.items(), key=lambda item: item[1], reverse=True))}\n")
-            letter = max(grades, key=grades.get)
-            print(letter, end=' ')
-        file.write(f"\n")
-
-def generate_text(text, size):
-    font = ImageFont.truetype("6sem/results/6.1/input/Arial-Italic.ttf", size)
-    image = Image.new("L", (1200, size), color="white")
-    draw = ImageDraw.Draw(image)
-    draw.text((0, 0), text=text, font=font, color="black")
-    binarization(image, 100).save(f"7sem/results/input/sentence_{size}.png")
-
-def main():
-    #Плохо классифицирует символы, додедлать
-    generate_text("snow cat and bear", 100)
-    create_regocnition("5sem/results/2.26/output/data.csv")
-        
-if __name__ == '__main__':
-    main()
+    recognized_text = get_regocnition(text, img, segments)

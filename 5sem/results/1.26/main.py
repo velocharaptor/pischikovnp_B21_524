@@ -1,16 +1,29 @@
 from PIL import Image, ImageDraw, ImageFont
+import numpy as np
 
-def main():
-    letters = "abcdefghijklmnopqrstuvwxyz"
-    font = ImageFont.truetype("5sem/results/1.26/font/Arial-Italic.ttf", 69)
+start_unicode = ord('a')
+end_unicode = ord('z')
 
-    for letter in letters:
+ENG_LETTER = [chr(code_point) for code_point in range(start_unicode, end_unicode + 1)]
+
+def binarization(image, threshold):
+    old_image = np.array(image)
+    new_image = np.zeros(shape=old_image.shape)
+    new_image[old_image > threshold] = 255
+    return Image.fromarray(new_image.astype(np.uint8), 'L')
+
+def main(letters):
+    font = ImageFont.truetype("5sem/results/1.26/font_Italic/Arial-Italic.ttf", 52)
+
+    for i in range(len(letters)):
+        letter = letters[i]
         _, _, width, height = font.getbbox(letter)
 
         image = Image.new("L", (width, height), color="white")
         draw = ImageDraw.Draw(image)
         draw.text((0, 0), letter, font=font, color="black")
-        image.save(f"5sem/results/1.26/font/{letter}.png")
+
+        binarization(image, 50).save(f"5sem/results/1.26/font_Italic/{letter}.png")
 
 if __name__ == '__main__':
-    main()
+    main(ENG_LETTER)

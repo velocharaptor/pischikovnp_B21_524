@@ -1,0 +1,20 @@
+phrase:      showmeyourpower
+detected:    showmeyourdower
+correct:     94%
+
+has | got | correct
+s	s	True
+h	h	True
+o	o	True
+w	w	True
+m	m	True
+e	e	True
+y	y	True
+o	o	True
+u	u	True
+r	r	True
+p	d	False
+o	o	True
+w	w	True
+e	e	True
+r	r	True

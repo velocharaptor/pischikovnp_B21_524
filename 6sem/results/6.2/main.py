@@ -1,7 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 from matplotlib import pyplot as plt
-import math
 
 def get_profiles(img):
     return {
@@ -28,7 +27,7 @@ def add_profile(img, type):
         plt.ylim(max(profiles["y"]["y_range"]), 0 )
         plt.xlim(0, max(profiles["y"]["y"]))
 
-    plt.savefig(f"6sem/results/6.2/output/profile/{type}/profile_{type}.png")
+    plt.savefig(f"6sem/results/6.2/output/profile/unicode/{type}/profile_{type}.png")
     plt.clf()
 
 def create_profiles(img):
@@ -38,45 +37,43 @@ def create_profiles(img):
     add_profile(img_arr, "x")
     add_profile(img_arr, "y")
 
-def fix_color(img):  
-    return np.asarray(np.asarray(img) < 1, dtype = np.int0)
-
 def get_segments(img):
-    img_arr_for_calculations = fix_color(img)
-    x_profiles = np.sum(img_arr_for_calculations, axis=0) 
-    lst = [] 
-    new_lst = []  
-    for i in range(len(x_profiles)):   
-        if x_profiles[i] == 0:
-            lst.append(i)
-    lst.append(img.width)  
+    profile = np.sum(img == 0, axis=0)
 
-    for i in range(len(lst)-1):
-        if lst[i] + 1 != lst[i+1]:
-            new_lst.append(lst[i])
-            new_lst.append(lst[i+1])
-    new_lst.append(img.width-1)
-    new_lst = sorted(list(set(new_lst))) 
+    in_letter = False
+    letter_segment = []
 
-    segments = []
-    for i in range(0, len(new_lst)-1, 2):
-        segments.append((new_lst[i], new_lst[i+1]))
-    return segments
+    for i in range(len(profile)):
+        if profile[i] > 0:
+            if not in_letter:
+                in_letter = True
+                start = i
+        else:
+            if in_letter:
+                in_letter = False
+                end = i
+                letter_segment.append((start - 1, end))
 
-def crop_segments():
-    img = Image.open("6sem/results/6.1/output/sentence.png").convert('L')
-    segments = get_segments(img)
+    if in_letter:
+        letter_segment.append((start, len(profile)))
+
+    return letter_segment
+
+def crop_segments(img, segments):
+    image = Image.fromarray(img)
     i = 0
-    for segment in segments:
-        box = (segment[0] + 1, 0, segment[1] - 1, img.height)
-        res = img.crop(box)
-        res.save(f"6sem/results/6.2/output/letters/{i + 1}.png")
+    for start, end in segments:
+        left, right = start, end
+        top, bottom = 0, img.shape[0]
+        box = (left + 1, top, right, bottom)
+        res = image.crop(box)
+        res.save(f"6sem/results/6.2/output/letters/unicode/{i + 1}.png")
         i+=1
 
 def main():
-    #сегменты вырезаются, не обводятся, нужно добавить удаление белых пиксилей
-    test_img = Image.open("6sem/results/6.1/output/sentence.png")
-    crop_segments()
+    test_img = np.array(Image.open("6sem/results/6.1/output/text_unicode.bmp"))
+    segments = get_segments(test_img)
+    crop_segments(test_img, segments)
     create_profiles(test_img)
 
 if __name__ == '__main__':

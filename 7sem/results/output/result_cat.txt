@@ -1,0 +1,19 @@
+phrase:      snowcatandbear
+detected:    snowcafanddear
+correct:     86%
+
+has | got | correct
+s	s	True
+n	n	True
+o	o	True
+w	w	True
+c	c	True
+a	a	True
+t	f	False
+a	a	True
+n	n	True
+d	d	True
+b	d	False
+e	e	True
+a	a	True
+r	r	True

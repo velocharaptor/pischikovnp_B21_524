@@ -1,18 +1,30 @@
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 
-def binarization(image, threshold):
-    old_image = np.array(image)
+def binarization(img, threshold=75):
+    old_image = np.array(img)
     new_image = np.zeros(shape=old_image.shape)
     new_image[old_image > threshold] = 255
-    return Image.fromarray(new_image.astype(np.uint8), 'L')
+    return new_image.astype(np.uint8)
 
 def main():
-    font = ImageFont.truetype("6sem/results/6.1/input/Arial-Italic.ttf", 69)
-    image = Image.new("L", (615, 80), color="white")
-    draw = ImageDraw.Draw(image)
-    draw.text((0, 0), text="snow cat and bear", font=font, color="black")
-    binarization(image, 50).save(f"6sem/results/6.1/output/sentence.png")
+    phrase = "show me your power"
+    space_len = 5
+    phrase_width = sum(ImageFont.truetype("5sem/results/1.26/font_Italic/Arial-Italic.ttf", 52).getsize(char)[0] for char in phrase) + space_len * (len(phrase) - 1)
+
+    height = max(ImageFont.truetype("5sem/results/1.26/font_Italic/Arial-Italic.ttf", 52).getsize(char)[1] for char in phrase)
+
+    img = Image.new("L", (phrase_width, height), color="white")
+    draw = ImageDraw.Draw(img)
+
+    current_x = 0
+    for letter in phrase:
+        width, letter_height = ImageFont.truetype("5sem/results/1.26/font_Italic/Arial-Italic.ttf", 52).getsize(letter)
+        draw.text((current_x, height - letter_height), letter, "black", font=ImageFont.truetype("5sem/results/1.26/font_Italic/Arial-Italic.ttf", 52))
+        current_x += width + space_len
+
+    img = Image.fromarray(binarization(img))
+    img.save("6sem/results/6.1/output/text_power.bmp")
 
 if __name__ == '__main__':
     main()
